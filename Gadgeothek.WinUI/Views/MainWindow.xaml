@@ -1,0 +1,46 @@
+﻿<Window x:Class="Gadgeothek.WinUI.Views.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ch.hsr.wpf.gadgeothek.admin"
+        mc:Ignorable="d"
+        Title="Gadgeothek" Height="350" MinHeight="350" MinWidth="525" Width="525">
+    <Grid>
+        <TabControl x:Name="tabControl" MinHeight="319" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+            <TabItem Header="Gadgets">
+                <Grid Background="#FFE5E5E5">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="18" Margin="0,5,0,5" VerticalAlignment="Top">
+                        <Button x:Name="addGadget" Content="Gadget hinzufügen" Width="Auto" Height="Auto" Margin="5,0,0,0" Padding="15,0,15,0" Command="{Binding OpenAddGadgetCommand}" />
+                        <Button x:Name="removeGadget" Content="Gadget löschen" Width="Auto" Height="Auto" Margin="5,0,0,0" Padding="15,0,15,0" Command="{Binding RemoveGadgetCommand}" />
+                    </StackPanel>
+                    <DataGrid x:Name="gadgetsGrid" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto" CanUserAddRows="False"  VerticalAlignment="Top" Margin="0,28,0,0" ColumnWidth="*" ItemsSource="{Binding Gadgets}" SelectedItem="{Binding SelectedGadget, Mode=TwoWay}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Width="40" IsReadOnly="True" Binding="{Binding InventoryNumber}" />
+                            <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}" />
+                            <DataGridTextColumn Header="Hersteller" IsReadOnly="True" Binding="{Binding Manufacturer}" />
+                            <DataGridTextColumn Header="Preis" IsReadOnly="True" Binding="{Binding Price}" />
+                            <DataGridTextColumn Header="Zustand" IsReadOnly="True" Binding="{Binding Condition}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+            <TabItem Header="Ausleihe">
+                <Grid Background="#FFE5E5E5">
+                    <DataGrid x:Name="loansGrid" HorizontalAlignment="Stretch" CanUserAddRows="False"  VerticalAlignment="Top" ColumnWidth="*" ItemsSource="{Binding Loans}" AutoGenerateColumns="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="ID" Width="40" IsReadOnly="True" Binding="{Binding Id}" />
+                            <DataGridTextColumn Header="Kunde" IsReadOnly="True" Binding="{Binding Customer.Name}" />
+                            <DataGridTextColumn Header="Gadget" IsReadOnly="True" Binding="{Binding Gadget.Name}" />
+                            <DataGridTextColumn Header="Ausgeliehen am" IsReadOnly="True" Binding="{Binding PickupDate, StringFormat=\{0:dd.MM.yyyy\}}" />
+                            <DataGridTextColumn Header="Zurück bis" IsReadOnly="True" Binding="{Binding OverDueDate, StringFormat=\{0:dd.MM.yyyy\}}" />
+                            <DataGridCheckBoxColumn Header="Fällig" IsReadOnly="True" Binding="{Binding IsOverdue, Mode=OneWay}" />
+                            <DataGridCheckBoxColumn Header="Zurückgegeben" IsReadOnly="True" Binding="{Binding WasReturned, Mode=OneWay}" />
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+    </Grid>
+</Window>
