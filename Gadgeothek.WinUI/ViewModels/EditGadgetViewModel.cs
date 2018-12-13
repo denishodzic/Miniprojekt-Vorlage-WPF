@@ -1,19 +1,26 @@
 ﻿using ch.hsr.wpf.gadgeothek.domain;
-using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 
 namespace Gadgeothek.WinUI.ViewModels
 {
-
-    class AddGadgetViewModel : BindableBase, IGadgetEditViewModel
+    public class EditGadgetViewModel : BindableBase
     {
-        public string Title { get; } = "Gadget hinzufügen";
+        public string Title { get; } = "Gadget editieren";
+
+        private MainWindowViewModel _mainWindowViewModel;
+
+        public EditGadgetViewModel( MainWindowViewModel mainWindowViewModel , Gadget selectedGadget)
+        {
+            _mainWindowViewModel = mainWindowViewModel;
+
+            InventoryNumber = selectedGadget.InventoryNumber;
+            Name = selectedGadget.Name;
+            Manufacturer = selectedGadget.Manufacturer;
+            Price = selectedGadget.Price;
+            Condition = selectedGadget.Condition;
+        }
+
         private ICommand _closeDialogCommand;
         public ICommand CancelCommand => _closeDialogCommand ??
             ( _closeDialogCommand = new RelayCommand<Window>( ( changeGadgetWindow ) =>
@@ -34,27 +41,15 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 try
                 {
-                    var newGadget = new Gadget( _name )
-                    {
-                        Condition = _condition,
-                        Manufacturer = _manufacturer,
-                        Price = _price
-                    };
-
-                    if ( _mainWindowViewModel.libraryAdminService.AddGadget( newGadget ) )
-                    {
-                        _mainWindowViewModel.Gadgets.Add( newGadget );
-                    }
-                    else
-                    {
-                        MessageBox.Show( "Fehler beim Speichern des Gadgets. Bitte versuchen Sie es nochmals.", "Speichern fehlgeschlagen", MessageBoxButton.OK );
-                    }
+                    _mainWindowViewModel.UpdateGadget( this );
                 }
                 finally
                 {
                     changeGadgetWindow.Close();
                 }
             } ) );
+
+        public string InventoryNumber { get; }
 
         private bool _isFormValid;
         public bool IsFormValid
@@ -70,6 +65,7 @@ namespace Gadgeothek.WinUI.ViewModels
             }
         }
 
+
         private string _name;
         public string Name
         {
@@ -81,12 +77,13 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _name = value;
                 RaisePropertyChanged();
-                validateForm();
+                //validateForm();
             }
         }
 
         private string _manufacturer;
-        public string Manufacturer {
+        public string Manufacturer
+        {
             get
             {
                 return _manufacturer;
@@ -95,7 +92,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _manufacturer = value;
                 RaisePropertyChanged();
-                validateForm();
+                //validateForm();
             }
         }
 
@@ -110,7 +107,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _price = value;
                 RaisePropertyChanged();
-                validateForm();
+               // validateForm();
             }
         }
 
@@ -126,41 +123,8 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _condition = value;
                 RaisePropertyChanged();
-                validateForm();
+                //validateForm();
             }
-        }
-
-        private MainWindowViewModel _mainWindowViewModel;
-
-        public AddGadgetViewModel(MainWindowViewModel mainWindowViewModel)
-        {
-           _mainWindowViewModel = mainWindowViewModel;
-        }
-        
-        private void validateForm()
-        {
-            if (_name == null || _name.Length <= 0)
-            {
-                IsFormValid = false;
-                return;
-            }
-
-            if (_manufacturer == null || _manufacturer.Length <= 0)
-            {
-                IsFormValid = false;
-                return;
-            }
-
-            if (_price <= 0.0)
-            {
-                IsFormValid = false;
-                return;
-            }
-
-            IsFormValid = true;
-            CommandManager.InvalidateRequerySuggested();
-
-            Debug.Print("Form is Valid");
         }
     }
 }
