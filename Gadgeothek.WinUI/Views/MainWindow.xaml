@@ -14,7 +14,9 @@
                         <Button x:Name="addGadget" Content="Gadget hinzufügen" Width="Auto" Height="Auto" Margin="5,0,0,0" Padding="15,0,15,0" Command="{Binding OpenAddGadgetCommand}" />
                         <Button x:Name="removeGadget" Content="Gadget löschen" Width="Auto" Height="Auto" Margin="5,0,0,0" Padding="15,0,15,0" Command="{Binding RemoveGadgetCommand}" />
                     </StackPanel>
-                    <DataGrid x:Name="gadgetsGrid" HorizontalAlignment="Stretch" VerticalScrollBarVisibility="Auto" CanUserAddRows="False"  VerticalAlignment="Top" Margin="0,28,0,0" ColumnWidth="*" ItemsSource="{Binding Gadgets}" SelectedItem="{Binding SelectedGadget, Mode=TwoWay}" AutoGenerateColumns="False">
+                    <DataGrid x:Name="gadgetsGrid" HorizontalAlignment="Stretch" 
+                              VerticalScrollBarVisibility="Auto" CanUserAddRows="False"  VerticalAlignment="Top" Margin="0,28,0,0" ColumnWidth="*" 
+                              ItemsSource="{Binding Gadgets}" SelectedItem="{Binding SelectedGadget, Mode=TwoWay}" AutoGenerateColumns="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Width="40" IsReadOnly="True" Binding="{Binding InventoryNumber}" />
                             <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}" />
