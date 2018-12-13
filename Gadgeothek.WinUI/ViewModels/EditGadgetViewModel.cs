@@ -9,16 +9,13 @@ namespace Gadgeothek.WinUI.ViewModels
         public string Title { get; } = "Gadget editieren";
 
         private MainWindowViewModel _mainWindowViewModel;
+        private GadgetViewModel _gadget;
 
-        public EditGadgetViewModel( MainWindowViewModel mainWindowViewModel , Gadget selectedGadget)
+        public EditGadgetViewModel( MainWindowViewModel mainWindowViewModel , GadgetViewModel selectedGadget)
         {
             _mainWindowViewModel = mainWindowViewModel;
 
-            InventoryNumber = selectedGadget.InventoryNumber;
-            Name = selectedGadget.Name;
-            Manufacturer = selectedGadget.Manufacturer;
-            Price = selectedGadget.Price;
-            Condition = selectedGadget.Condition;
+            _gadget = selectedGadget;
         }
 
         private ICommand _closeDialogCommand;
@@ -41,7 +38,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 try
                 {
-                    _mainWindowViewModel.UpdateGadget( this );
+                    _mainWindowViewModel.UpdateGadget(_gadget);
                 }
                 finally
                 {
@@ -66,62 +63,58 @@ namespace Gadgeothek.WinUI.ViewModels
         }
 
 
-        private string _name;
         public string Name
         {
             get
             {
-                return _name;
+                return _gadget.Name;
             }
             set
             {
-                _name = value;
+                _gadget.Name = value;
                 RaisePropertyChanged();
                 //validateForm();
             }
         }
 
-        private string _manufacturer;
         public string Manufacturer
         {
             get
             {
-                return _manufacturer;
+                return _gadget.Manufacturer;
             }
             set
             {
-                _manufacturer = value;
+                _gadget.Manufacturer = value;
                 RaisePropertyChanged();
                 //validateForm();
             }
         }
 
-        private double _price;
         public double Price
         {
             get
             {
-                return _price;
+                return _gadget.Price;
             }
             set
             {
-                _price = value;
+                _gadget.Price = value;
                 RaisePropertyChanged();
                // validateForm();
             }
         }
 
 
-        private ch.hsr.wpf.gadgeothek.domain.Condition _condition;
         public ch.hsr.wpf.gadgeothek.domain.Condition Condition
         {
             get
             {
-                return _condition;
+                return _gadget.Condition;
             }
             set
             {
-                _condition = value;
+                _gadget.Condition = value;
                 RaisePropertyChanged();
                 //validateForm();
             }

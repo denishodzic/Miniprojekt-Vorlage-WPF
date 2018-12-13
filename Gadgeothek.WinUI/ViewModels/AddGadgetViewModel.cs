@@ -43,7 +43,7 @@ namespace Gadgeothek.WinUI.ViewModels
 
                     if ( _mainWindowViewModel.libraryAdminService.AddGadget( newGadget ) )
                     {
-                        _mainWindowViewModel.Gadgets.Add( newGadget );
+                        _mainWindowViewModel.Gadgets.Add( new GadgetViewModel(newGadget) );
                     }
                     else
                     {

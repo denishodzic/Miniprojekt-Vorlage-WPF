@@ -31,23 +31,19 @@ namespace Gadgeothek.WinUI.ViewModels
 
         public GadgetViewModel SelectedGadget { get; set; }
 
-        internal void UpdateGadget( EditGadgetViewModel editGadgetViewModel )
+        internal void UpdateGadget( GadgetViewModel editGadgetViewModel )
         {
             var existingGadget = Gadgets.FirstOrDefault( g => g.InventoryNumber == editGadgetViewModel.InventoryNumber );
             if(existingGadget != null )
             {
-                existingGadget.Name = editGadgetViewModel.Name;
-                existingGadget.Manufacturer = editGadgetViewModel.Manufacturer;
-                existingGadget.Price = editGadgetViewModel.Price;
-                existingGadget.Condition = editGadgetViewModel.Condition;
-                libraryAdminService.UpdateGadget( existingGadget );
+                libraryAdminService.UpdateGadget(editGadgetViewModel.Data);
             }
 
             
         }
 
-        private ObservableCollection<Gadget> _gadgets;
-        public ObservableCollection<Gadget> Gadgets
+        private ObservableCollection<GadgetViewModel> _gadgets;
+        public ObservableCollection<GadgetViewModel> Gadgets
         {
             get { return _gadgets; }
             set

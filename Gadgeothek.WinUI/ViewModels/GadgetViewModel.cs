@@ -4,7 +4,7 @@ namespace Gadgeothek.WinUI.ViewModels
 {
     public class GadgetViewModel : BindableBase
     {
-        public readonly Gadget Data { get; }
+        public Gadget Data { get; }
 
         public GadgetViewModel(Gadget data)
         {

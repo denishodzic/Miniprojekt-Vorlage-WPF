@@ -31,7 +31,7 @@ namespace Gadgeothek.WinUI.Views
             DataContext = new AddGadgetViewModel(mainWindowViewModel);
         }
 
-        public ChangeGadgetView( EditGadgetViewModel editGadgetViewModel )
+        public ChangeGadgetView(EditGadgetViewModel editGadgetViewModel )
         {
             InitializeComponent();
 
