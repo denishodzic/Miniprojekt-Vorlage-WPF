@@ -24,10 +24,10 @@ namespace Gadgeothek.WinUI.ViewModels
         private ICommand _removeGadgetCommand;
         public ICommand RemoveGadgetCommand => _removeGadgetCommand ?? (_removeGadgetCommand = new RelayCommand(() => RemoveGadget()));
 
-        public Gadget SelectedGadget { get; set; }
+        public GadgetViewModel SelectedGadget { get; set; }
 
-        private ObservableCollection<Gadget> _gadgets;
-        public ObservableCollection<Gadget> Gadgets
+        private ObservableCollection<GadgetViewModel> _gadgets;
+        public ObservableCollection<GadgetViewModel> Gadgets
         {
             get { return _gadgets; }
             set
@@ -60,7 +60,7 @@ namespace Gadgeothek.WinUI.ViewModels
                 MessageBox.Show("Konnte Gadgets nicht vom Server laden.", "Serverfehler", MessageBoxButton.OK);
             } else if (gadgets.Count > 0)
             {
-                Gadgets = new ObservableCollection<Gadget>(gadgets);
+                Gadgets = new ObservableCollection<GadgetViewModel>( gadgets.Select(g => new GadgetViewModel(g)) );
 
                 SelectedGadget = Gadgets.First();
             }
@@ -115,11 +115,11 @@ namespace Gadgeothek.WinUI.ViewModels
                 
                 if (SelectedGadget != null)
                 {
-                    MessageBoxResult dialogResult = MessageBox.Show($"Sind Sie sicher, dass Sie{Environment.NewLine}{Environment.NewLine}{SelectedGadget.FullDescription()}{Environment.NewLine}{Environment.NewLine}löschen möchten?", "Löschen bestätigen", MessageBoxButton.YesNo);
+                    MessageBoxResult dialogResult = MessageBox.Show($"Sind Sie sicher, dass Sie{Environment.NewLine}{Environment.NewLine}{SelectedGadget.Data.FullDescription()}{Environment.NewLine}{Environment.NewLine}löschen möchten?", "Löschen bestätigen", MessageBoxButton.YesNo);
 
                     if (dialogResult == MessageBoxResult.Yes)
                     {
-                        if (libraryAdminService.DeleteGadget(SelectedGadget))
+                        if (libraryAdminService.DeleteGadget(SelectedGadget.Data))
                         {
                             Gadgets.Remove(SelectedGadget);
                         }
