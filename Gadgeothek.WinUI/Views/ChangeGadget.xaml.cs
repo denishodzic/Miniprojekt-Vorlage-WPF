@@ -20,15 +20,22 @@ using System.Windows.Shapes;
 namespace Gadgeothek.WinUI.Views
 {
     /// <summary>
-    /// Interaktionslogik für AddGadget.xaml
+    /// Interaktionslogik für ChangeGadgetView.xaml
     /// </summary>
-    public partial class AddGadget : Window
+    public partial class ChangeGadgetView : Window
     {
-        public AddGadget(MainWindowViewModel mainWindowViewModel)
+        public ChangeGadgetView( MainWindowViewModel mainWindowViewModel)
         {
             InitializeComponent();
 
             DataContext = new AddGadgetViewModel(mainWindowViewModel);
+        }
+
+        public ChangeGadgetView( EditGadgetViewModel editGadgetViewModel )
+        {
+            InitializeComponent();
+
+            DataContext = editGadgetViewModel;
         }
     }
 }

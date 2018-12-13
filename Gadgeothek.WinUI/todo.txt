@@ -1,0 +1,3 @@
+gadget editieren
+kunden CRUD
+Ausleihe Start und beenden
