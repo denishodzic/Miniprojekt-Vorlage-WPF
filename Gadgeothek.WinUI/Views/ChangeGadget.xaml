@@ -17,6 +17,7 @@
                 <x:Type TypeName="dom:Condition"/>
             </ObjectDataProvider.MethodParameters>
         </ObjectDataProvider>
+        
     </Window.Resources>
 
     <Grid>
@@ -34,14 +35,16 @@
         </Grid.ColumnDefinitions>
 
         <Label Grid.Row="1" Grid.Column="0">Name</Label>
-        <TextBox Grid.Row="1" Grid.Column="1" Margin="5" x:Name="textName" Text="{Binding Name}" />
+        <TextBox Grid.Row="1" Grid.Column="1" Margin="5" x:Name="textName" Text="{Binding Name, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
         <Label Grid.Row="2" Grid.Column="0">Manufacturer</Label>
-        <TextBox Grid.Row="2" Grid.Column="1" Margin="5" x:Name="textManufacturer" Text="{Binding Manufacturer}">
+        <TextBox Grid.Row="2" Grid.Column="1" Margin="5" x:Name="textManufacturer" Text="{Binding Manufacturer, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}">
+           
         </TextBox>
 
         <Label Grid.Row="3" Grid.Column="0">Price</Label>
-        <TextBox Grid.Row="3" Grid.Column="1" Margin="5" x:Name="textPrice" Text="{Binding Price}" />
+        <TextBox Grid.Row="3" Grid.Column="1" Margin="5" x:Name="textPrice"
+                 Text="{Binding Price, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}" />
 
         <Label Grid.Row="4" Grid.Column="0">Condition:</Label>
         <ComboBox Grid.Row="4" Grid.Column="1" Margin="5" HorizontalAlignment="Stretch" 
@@ -56,9 +59,10 @@
                 Command="{Binding CancelCommand, Mode=OneWay}" 
                 CommandParameter="{Binding ElementName=ChangeGadgetWindow}" />
         <Button x:Name="buttonSave" Grid.Row="6" Grid.Column="1" Content="Save" Height="Auto" Margin="5" 
-                IsEnabled="{Binding FormIsValid, Mode=TwoWay}" 
+                IsEnabled="{Binding HasErrors, Converter={StaticResource BooleanInversionConverter}, Mode=OneWay}" 
                 HorizontalAlignment="Right" 
                 Command="{Binding SaveCommand, Mode=OneWay}" 
                 CommandParameter="{Binding ElementName=ChangeGadgetWindow}" />
+
     </Grid>
 </Window>

@@ -24,11 +24,11 @@ namespace Gadgeothek.WinUI.Views
     /// </summary>
     public partial class ChangeGadgetView : Window
     {
-        public ChangeGadgetView( MainWindowViewModel mainWindowViewModel)
+        public ChangeGadgetView(AddGadgetViewModel addGadgetViewModel)
         {
             InitializeComponent();
 
-            DataContext = new AddGadgetViewModel(mainWindowViewModel);
+            DataContext = addGadgetViewModel;
         }
 
         public ChangeGadgetView(EditGadgetViewModel editGadgetViewModel )

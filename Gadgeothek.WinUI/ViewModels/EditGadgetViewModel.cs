@@ -1,10 +1,15 @@
 ﻿using ch.hsr.wpf.gadgeothek.domain;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Linq;
 using System.Windows;
 using System.Windows.Input;
 
 namespace Gadgeothek.WinUI.ViewModels
 {
-    public class EditGadgetViewModel : BindableBase
+    public class EditGadgetViewModel : BindableBase, IGadgetEditViewModel, INotifyDataErrorInfo
     {
         public string Title { get; } = "Gadget editieren";
 
@@ -15,7 +20,7 @@ namespace Gadgeothek.WinUI.ViewModels
         {
             _mainWindowViewModel = mainWindowViewModel;
 
-            _gadget = selectedGadget;
+            _gadget = new GadgetViewModel( selectedGadget.Data);
         }
 
         private ICommand _closeDialogCommand;
@@ -48,20 +53,7 @@ namespace Gadgeothek.WinUI.ViewModels
 
         public string InventoryNumber { get; }
 
-        private bool _isFormValid;
-        public bool IsFormValid
-        {
-            get
-            {
-                return _isFormValid;
-            }
-            set
-            {
-                _isFormValid = value;
-                RaisePropertyChanged();
-            }
-        }
-
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
 
         public string Name
         {
@@ -73,7 +65,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _gadget.Name = value;
                 RaisePropertyChanged();
-                //validateForm();
+                RaisePropertyChanged(nameof(HasErrors));
             }
         }
 
@@ -87,7 +79,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _gadget.Manufacturer = value;
                 RaisePropertyChanged();
-                //validateForm();
+                RaisePropertyChanged(nameof(HasErrors));
             }
         }
 
@@ -101,7 +93,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _gadget.Price = value;
                 RaisePropertyChanged();
-               // validateForm();
+                RaisePropertyChanged(nameof(HasErrors));
             }
         }
 
@@ -116,8 +108,39 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _gadget.Condition = value;
                 RaisePropertyChanged();
-                //validateForm();
             }
+        }
+
+        public bool HasErrors
+        {
+            get
+            {
+                _validationErrors.Clear();
+
+                if (Name == null || Name.Length <= 0)
+                {
+                    _validationErrors.Add(nameof(Name), "Invalid Name");
+                }
+
+                if (Manufacturer == null || Manufacturer.Length <= 0)
+                {
+                    _validationErrors.Add(nameof(Manufacturer), "Invalid Manufacturer");
+                }
+
+                if (Price < 0)
+                {
+                    _validationErrors.Add(nameof(Price), "Price has to be >= 0");
+                }
+
+                return _validationErrors.Any();
+            }
+        }
+
+        private IDictionary<string, string> _validationErrors = new Dictionary<string, string>();
+
+        public IEnumerable GetErrors(string propertyName)
+        {
+            return _validationErrors[propertyName];
         }
     }
 }

@@ -57,8 +57,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\RelayCommand.cs" />
+    <Compile Include="IntFormatConverter.cs" />
     <Compile Include="ViewModels\AddGadgetViewModel.cs" />
     <Compile Include="ViewModels\BindableBase.cs" />
+    <Compile Include="BooleanInversionConverter.cs" />
     <Compile Include="ViewModels\EditGadgetViewModel.cs" />
     <Compile Include="ViewModels\IGadgetEditViewModel.cs" />
     <Compile Include="ViewModels\GadgetViewModel.cs" />

@@ -1,6 +1,8 @@
 ﻿using ch.hsr.wpf.gadgeothek.domain;
 using System;
+using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text;
@@ -11,7 +13,7 @@ using System.Windows.Input;
 namespace Gadgeothek.WinUI.ViewModels
 {
 
-    class AddGadgetViewModel : BindableBase, IGadgetEditViewModel
+    public class AddGadgetViewModel : BindableBase, IGadgetEditViewModel, INotifyDataErrorInfo
     {
         public string Title { get; } = "Gadget hinzufügen";
         private ICommand _closeDialogCommand;
@@ -55,20 +57,7 @@ namespace Gadgeothek.WinUI.ViewModels
                     changeGadgetWindow.Close();
                 }
             } ) );
-
-        private bool _isFormValid;
-        public bool IsFormValid
-        {
-            get
-            {
-                return _isFormValid;
-            }
-            set
-            {
-                _isFormValid = value;
-                RaisePropertyChanged();
-            }
-        }
+        
 
         private string _name;
         public string Name
@@ -81,7 +70,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _name = value;
                 RaisePropertyChanged();
-                validateForm();
+                RaisePropertyChanged(nameof(HasErrors));
             }
         }
 
@@ -95,7 +84,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _manufacturer = value;
                 RaisePropertyChanged();
-                validateForm();
+                RaisePropertyChanged(nameof(HasErrors));
             }
         }
 
@@ -110,7 +99,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _price = value;
                 RaisePropertyChanged();
-                validateForm();
+                RaisePropertyChanged(nameof(HasErrors));
             }
         }
 
@@ -126,7 +115,7 @@ namespace Gadgeothek.WinUI.ViewModels
             {
                 _condition = value;
                 RaisePropertyChanged();
-                validateForm();
+                RaisePropertyChanged(nameof(HasErrors));
             }
         }
 
@@ -136,31 +125,68 @@ namespace Gadgeothek.WinUI.ViewModels
         {
            _mainWindowViewModel = mainWindowViewModel;
         }
-        
-        private void validateForm()
+
+        public bool HasErrors
         {
-            if (_name == null || _name.Length <= 0)
+            get
             {
-                IsFormValid = false;
-                return;
+                _validationErrors.Clear();
+
+                if (Name == null || Name.Length <= 0)
+                {
+                    _validationErrors.Add(nameof(Name), "Invalid Name");
+                    //ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(Name)));
+                }
+
+                if (Manufacturer == null || Manufacturer.Length <= 0)
+                {
+                    _validationErrors.Add(nameof(Manufacturer), "Invalid Manufacturer");
+                    //ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(Manufacturer)));
+                }
+
+                if (Price < 0)
+                {
+                    _validationErrors.Add(nameof(Price), "Price has to be >= 0");
+                    //ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(Price)));
+                }
+
+                return _validationErrors.Any();
             }
-
-            if (_manufacturer == null || _manufacturer.Length <= 0)
-            {
-                IsFormValid = false;
-                return;
-            }
-
-            if (_price <= 0.0)
-            {
-                IsFormValid = false;
-                return;
-            }
-
-            IsFormValid = true;
-            CommandManager.InvalidateRequerySuggested();
-
-            Debug.Print("Form is Valid");
         }
+
+        private IDictionary<string, string> _validationErrors = new Dictionary<string, string>();
+
+        public event EventHandler<DataErrorsChangedEventArgs> ErrorsChanged;
+
+        public IEnumerable GetErrors(string propertyName)
+        {
+            return _validationErrors[propertyName];
+        }
+
+        //private void validateForm()
+        //{
+        //    if (_name == null || _name.Length <= 0)
+        //    {
+        //        IsFormValid = false;
+        //        return;
+        //    }
+
+        //    if (_manufacturer == null || _manufacturer.Length <= 0)
+        //    {
+        //        IsFormValid = false;
+        //        return;
+        //    }
+
+        //    if (_price <= 0.0)
+        //    {
+        //        IsFormValid = false;
+        //        return;
+        //    }
+
+        //    IsFormValid = true;
+        //    CommandManager.InvalidateRequerySuggested();
+
+        //    Debug.Print("Form is Valid");
+        //}
     }
 }

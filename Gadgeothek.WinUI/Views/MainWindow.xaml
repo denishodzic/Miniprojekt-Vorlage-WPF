@@ -12,15 +12,23 @@
                 <Grid Background="#FFE5E5E5">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="18" Margin="0,5,0,5" VerticalAlignment="Top">
                         <Button x:Name="addGadget" Content="Gadget hinzufügen" Width="Auto" Height="Auto" Margin="5,0,0,0" Padding="15,0,15,0" Command="{Binding OpenAddGadgetCommand}" />
-                        <Button x:Name="removeGadget" Content="Gadget löschen" Width="Auto" Height="Auto" Margin="5,0,0,0" Padding="15,0,15,0" Command="{Binding RemoveGadgetCommand}" />
+                        <Button x:Name="removeGadget" Content="Gadget löschen" Margin="5,0,0,0" 
+                                Command="{Binding RemoveGadgetCommand}"
+                                IsEnabled="{Binding IsGadgetSelected}"
+                                />
+                        
                         <Button x:Name="EditGadgetButton" 
                                 Content="Gadget editieren" 
                                 Margin="5,0,0,0"
+                                IsEnabled="{Binding IsGadgetSelected}"
                                 Command="{Binding EditGadgetCommand}" />
                     </StackPanel>
                     <DataGrid x:Name="gadgetsGrid" HorizontalAlignment="Stretch" 
                               VerticalScrollBarVisibility="Auto" CanUserAddRows="False"  VerticalAlignment="Top" Margin="0,28,0,0" ColumnWidth="*" 
-                              ItemsSource="{Binding Gadgets}" SelectedItem="{Binding SelectedGadget, Mode=TwoWay}" AutoGenerateColumns="False">
+                              IsSynchronizedWithCurrentItem="True"
+                              ItemsSource="{Binding GadgetsCollectionView}" 
+                              SelectedItem="{Binding SelectedGadget, Mode=TwoWay}" 
+                              AutoGenerateColumns="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Width="40" IsReadOnly="True" Binding="{Binding InventoryNumber}" />
                             <DataGridTextColumn Header="Name" IsReadOnly="True" Binding="{Binding Name}" />
