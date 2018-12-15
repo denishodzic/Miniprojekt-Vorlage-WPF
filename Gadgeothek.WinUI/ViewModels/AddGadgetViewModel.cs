@@ -43,7 +43,7 @@ namespace Gadgeothek.WinUI.ViewModels
                         Price = _price
                     };
 
-                    if ( _mainWindowViewModel.libraryAdminService.AddGadget( newGadget ) )
+                    if ( _mainWindowViewModel.dataService.AddGadget( newGadget ) )
                     {
                         _mainWindowViewModel.Gadgets.Add( new GadgetViewModel(newGadget) );
                     }

@@ -2,6 +2,8 @@
 
 namespace Gadgeothek.WinUI.ViewModels
 {
+
+
     public class GadgetViewModel : BindableBase
     {
         public Gadget Data { get; }

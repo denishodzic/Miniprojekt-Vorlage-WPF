@@ -17,7 +17,69 @@ namespace Gadgeothek.WinUI.ViewModels
 {
     public class MainWindowViewModel : BindableBase
     {
-        public LibraryAdminService libraryAdminService;
+        public LibraryAdminService dataService;
+
+
+        public MainWindowViewModel()
+        {
+            dataService = new LibraryAdminService(ConfigurationManager.AppSettings.Get("server")?.ToString());
+
+            try
+            {
+                Gadgets = new ObservableCollection<GadgetViewModel>(dataService.GetAllGadgets()
+                    .Select(g => new GadgetViewModel(g)));
+                SelectedGadget = Gadgets.FirstOrDefault();
+
+                Customers = new ObservableCollection<CustomerViewModel>(dataService.GetAllCustomers()
+                    .Select(c => 
+                    {
+                        var customerViewModel = new CustomerViewModel(c);
+                        customerViewModel.DataChanged += OnCustomerDataChanged;
+                        return customerViewModel;
+                    }));
+                SelectedCustomer = Customers.FirstOrDefault();
+
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Beim Laden ist ein Problem aufgetreten.", ex.Message, MessageBoxButton.OK);
+                return;
+            }
+
+            var loans = dataService.GetAllLoans();
+            if (loans == null)
+            {
+                MessageBox.Show("Konnte Ausleihen nicht vom Server laden.", "Serverfehler", MessageBoxButton.OK);
+                return;
+            }
+            else if (loans.Count > 0)
+            {
+                Loans = new ObservableCollection<Loan>(loans);
+
+                SelectedLoan = Loans.First();
+            }
+
+            Task.Run(() =>
+            {
+                while (true)
+                {
+                    Thread.Sleep(5000);
+                    App.Current.Dispatcher.Invoke(() =>
+                    {
+                        loans = dataService.GetAllLoans();
+                        if (loans != null)
+                        {
+                            Loans.Clear();
+
+                            loans.ForEach(Loans.Add);
+                        }
+                    });
+                }
+
+            });
+        }
+
+        #region Gadgets
 
         private ICommand _openAddGadgetCommand;
         public ICommand OpenAddGadgetCommand => _openAddGadgetCommand ?? (_openAddGadgetCommand = new RelayCommand(() => OpenAddGadget()));
@@ -40,7 +102,7 @@ namespace Gadgeothek.WinUI.ViewModels
                 existingGadget.Price = editGadgetViewModel.Price;
                 existingGadget.Manufacturer = editGadgetViewModel.Manufacturer;
 
-                libraryAdminService.UpdateGadget(editGadgetViewModel.Data);
+                dataService.UpdateGadget(editGadgetViewModel.Data);
             }
         }
 
@@ -88,6 +150,98 @@ namespace Gadgeothek.WinUI.ViewModels
             }
         }
 
+        #endregion
+
+        #region Customers
+
+        private ICommand _createCustomerCommand;
+        public ICommand CreateCustomerCommand => _createCustomerCommand ?? 
+            (_createCustomerCommand = new RelayCommand(() => 
+            {
+                var newCustomer = new Customer()
+                {
+                    Name = "<Name>",
+                    Email = "<Email>",
+                    Password = "<Password>",
+                    Studentnumber = Guid.NewGuid().ToString("N")
+                };
+
+                if (!dataService.AddCustomer(newCustomer))
+                {
+                    MessageBox.Show("CreateCustomer failed", "Serverfehler", MessageBoxButton.OK);
+                    return;
+                }
+
+                var newCustomerViewModel = new CustomerViewModel(dataService.GetCustomer(newCustomer.Studentnumber));
+                newCustomerViewModel.DataChanged += OnCustomerDataChanged;
+                Customers.Add(newCustomerViewModel);
+            }
+            ));
+        
+        private ICommand _removeCustomerCommand;
+        public ICommand RemoveCustomerCommand => _removeCustomerCommand ??
+            (_removeCustomerCommand = new RelayCommand(() =>
+            {
+                if (!dataService.DeleteCustomer(SelectedCustomer.Data))
+                {
+                    MessageBox.Show("DeleteCustomer failed", "Serverfehler", MessageBoxButton.OK);
+                    return;
+                }
+
+                SelectedCustomer.DataChanged -= OnCustomerDataChanged;
+                Customers.Remove(SelectedCustomer);
+            }));
+
+        private ObservableCollection<CustomerViewModel> _customers;
+        public ObservableCollection<CustomerViewModel> Customers
+        {
+            get { return _customers; }
+            set
+            {
+                _customers = value;
+                RaisePropertyChanged();
+            }
+        }
+
+        private ICollectionView _customersCollectionView;
+        public ICollectionView CustomersCollectionView
+        {
+            get
+            {
+                if (_customersCollectionView == null)
+                {
+                    _customersCollectionView = CollectionViewSource.GetDefaultView(Customers);
+                }
+
+                return _customersCollectionView;
+            }
+        }
+
+        public CustomerViewModel SelectedCustomer
+        {
+            get
+            {
+                return (CustomerViewModel)CustomersCollectionView.CurrentItem;
+            }
+            set
+            {
+                GadgetsCollectionView.MoveCurrentTo(value);
+                RaisePropertyChanged(nameof(IsCustomerSelected));
+            }
+        }
+
+        public bool IsCustomerSelected
+        {
+            get { return SelectedCustomer != null; }
+        }
+
+        private void OnCustomerDataChanged(CustomerViewModel customer, string propertyname)
+        {
+            dataService.UpdateCustomer(customer.Data);
+        }
+
+        #endregion
+
         public Loan SelectedLoan { get; set; }
         private ObservableCollection<Loan> _loans;
         public ObservableCollection<Loan> Loans
@@ -100,53 +254,6 @@ namespace Gadgeothek.WinUI.ViewModels
             }
         }
 
-        public MainWindowViewModel()
-        {
-            libraryAdminService = new LibraryAdminService(ConfigurationManager.AppSettings.Get("server")?.ToString());
-
-            var gadgets = libraryAdminService.GetAllGadgets();
-
-            if(gadgets == null)
-            {
-                MessageBox.Show("Konnte Gadgets nicht vom Server laden.", "Serverfehler", MessageBoxButton.OK);
-            }
-            else
-            {
-                Gadgets = new ObservableCollection<GadgetViewModel>( gadgets.Select(g => new GadgetViewModel(g)) );
-                SelectedGadget = Gadgets.FirstOrDefault();
-            }
-
-            var loans = libraryAdminService.GetAllLoans();
-            if (loans == null)
-            {
-                MessageBox.Show("Konnte Ausleihen nicht vom Server laden.", "Serverfehler", MessageBoxButton.OK);
-                return;
-            } else if (loans.Count > 0)
-            {
-                Loans = new ObservableCollection<Loan>(loans);
-
-                SelectedLoan = Loans.First();
-            }
-
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(5000);
-                    App.Current.Dispatcher.Invoke(() =>
-                    {
-                        loans = libraryAdminService.GetAllLoans();
-                        if (loans != null)
-                        {
-                            Loans.Clear();
-
-                            loans.ForEach(Loans.Add);
-                        }
-                    });
-                }
-
-            });
-        }
 
         public void OpenAddGadget()
         {
@@ -171,7 +278,7 @@ namespace Gadgeothek.WinUI.ViewModels
 
                     if (dialogResult == MessageBoxResult.Yes)
                     {
-                        if (libraryAdminService.DeleteGadget(SelectedGadget.Data))
+                        if (dataService.DeleteGadget(SelectedGadget.Data))
                         {
                             Gadgets.Remove(SelectedGadget);
                         }
