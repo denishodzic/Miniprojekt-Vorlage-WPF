@@ -39,6 +39,13 @@ namespace Gadgeothek.WinUI.ViewModels
                     }));
                 SelectedCustomer = Customers.FirstOrDefault();
 
+                 //dataService.DeleteLoan(dataService.GetLoan("d4b05cc5-5948-472a-bbfd-600b4d7578fa"));
+
+                Loans = new ObservableCollection<LoanViewModel>(dataService.GetAllLoans()
+                    .Select(l => new LoanViewModel(l)));
+                SelectedLoan = Loans.FirstOrDefault();
+
+                
             }
             catch (Exception ex)
             {
@@ -46,51 +53,56 @@ namespace Gadgeothek.WinUI.ViewModels
                 return;
             }
 
-            var loans = dataService.GetAllLoans();
-            if (loans == null)
-            {
-                MessageBox.Show("Konnte Ausleihen nicht vom Server laden.", "Serverfehler", MessageBoxButton.OK);
-                return;
-            }
-            else if (loans.Count > 0)
-            {
-                Loans = new ObservableCollection<Loan>(loans);
-
-                SelectedLoan = Loans.First();
-            }
-
-            Task.Run(() =>
-            {
-                while (true)
-                {
-                    Thread.Sleep(5000);
-                    App.Current.Dispatcher.Invoke(() =>
-                    {
-                        loans = dataService.GetAllLoans();
-                        if (loans != null)
-                        {
-                            Loans.Clear();
-
-                            loans.ForEach(Loans.Add);
-                        }
-                    });
-                }
-
-            });
         }
 
         #region Gadgets
 
         private ICommand _openAddGadgetCommand;
-        public ICommand OpenAddGadgetCommand => _openAddGadgetCommand ?? (_openAddGadgetCommand = new RelayCommand(() => OpenAddGadget()));
+        public ICommand OpenAddGadgetCommand => _openAddGadgetCommand ?? 
+            (_openAddGadgetCommand = new RelayCommand(() =>
+            {
+                var addNewGadgetWindow = new ChangeGadgetView(new AddGadgetViewModel(this));
+                addNewGadgetWindow.Show();
+            }
+            ));
 
         private ICommand _editGadgetCommand;
         public ICommand EditGadgetCommand => _editGadgetCommand ??
-            ( _editGadgetCommand = new RelayCommand( () => EditGadget() ) );
+            ( _editGadgetCommand = new RelayCommand( () => {
+                var editGadgetWindow = new ChangeGadgetView(new EditGadgetViewModel(this));
+                editGadgetWindow.Show();
+            } ) );
 
 
         private ICommand _removeGadgetCommand;
-        public ICommand RemoveGadgetCommand => _removeGadgetCommand ?? (_removeGadgetCommand = new RelayCommand(() => RemoveGadget()));
+        public ICommand RemoveGadgetCommand => _removeGadgetCommand 
+            ?? (_removeGadgetCommand = new RelayCommand(() => {
+                try
+                {
+                    if(SelectedGadget == null)
+                    {//do nothing
+                        return;
+                    }
+
+                    var dialogResult = MessageBox.Show($"Sind Sie sicher, dass Sie{Environment.NewLine}{Environment.NewLine}{SelectedGadget.Data.FullDescription()}{Environment.NewLine}{Environment.NewLine}löschen möchten?", "Löschen bestätigen", MessageBoxButton.YesNo);
+                    if (dialogResult == MessageBoxResult.Yes)
+                    {
+                        if (dataService.DeleteGadget(SelectedGadget.Data))
+                        {
+                            Gadgets.Remove(SelectedGadget);
+                        }
+                        else
+                        {
+                            MessageBox.Show("Fehler beim Löschen des Gadgets. Bitte versuchen Sie es nochmals.", "Löschen fehlgeschlagen", MessageBoxButton.OK);
+                        }
+                    }
+                }
+                catch (InvalidCastException exception)
+                {
+                    MessageBox.Show("Fehler beim Löschen des Gadgets. Bitte versuchen Sie es nochmals.", "Löschen fehlgeschlagen", MessageBoxButton.OK);
+                    Debug.Print(exception.ToString());
+                }
+            }));
         
         internal void UpdateGadget( GadgetViewModel editGadgetViewModel )
         {
@@ -225,7 +237,7 @@ namespace Gadgeothek.WinUI.ViewModels
             }
             set
             {
-                GadgetsCollectionView.MoveCurrentTo(value);
+                CustomersCollectionView.MoveCurrentTo(value);
                 RaisePropertyChanged(nameof(IsCustomerSelected));
             }
         }
@@ -242,9 +254,26 @@ namespace Gadgeothek.WinUI.ViewModels
 
         #endregion
 
-        public Loan SelectedLoan { get; set; }
-        private ObservableCollection<Loan> _loans;
-        public ObservableCollection<Loan> Loans
+        #region Loans
+
+        private ICommand _pickLoanCommand;
+        public ICommand PickLoanCommand => _pickLoanCommand ??
+            (_pickLoanCommand = new RelayCommand(() =>
+            {
+                var pickLoadnView = new AddLoanView(new PickLoanViewModel(this));
+                pickLoadnView.Show();
+            }
+            ));
+
+        private ICommand _returnLoanCommand;
+        public ICommand ReturnLoanCommand => _returnLoanCommand ??
+            (_returnLoanCommand = new RelayCommand(() =>
+            {
+               //return loan
+            }));
+
+        private ObservableCollection<LoanViewModel> _loans;
+        public ObservableCollection<LoanViewModel> Loans
         {
             get { return _loans; }
             set
@@ -254,48 +283,44 @@ namespace Gadgeothek.WinUI.ViewModels
             }
         }
 
-
-        public void OpenAddGadget()
+        private ICollectionView _loansCollectionView;
+        public ICollectionView LoansCollectionView
         {
-            var addNewGadgetWindow = new ChangeGadgetView(new AddGadgetViewModel(this));
-            addNewGadgetWindow.Show();
-        }
-
-        public void EditGadget()
-        {
-            var editGadgetWindow = new ChangeGadgetView( new EditGadgetViewModel( this, SelectedGadget ) );
-
-            editGadgetWindow.Show();
-        }
-
-        public void RemoveGadget()
-        {
-            try
+            get
             {
-                if (SelectedGadget != null)
+                if (_loansCollectionView == null)
                 {
-                    MessageBoxResult dialogResult = MessageBox.Show($"Sind Sie sicher, dass Sie{Environment.NewLine}{Environment.NewLine}{SelectedGadget.Data.FullDescription()}{Environment.NewLine}{Environment.NewLine}löschen möchten?", "Löschen bestätigen", MessageBoxButton.YesNo);
-
-                    if (dialogResult == MessageBoxResult.Yes)
-                    {
-                        if (dataService.DeleteGadget(SelectedGadget.Data))
-                        {
-                            Gadgets.Remove(SelectedGadget);
-                        }
-                        else
-                        {
-                            MessageBox.Show("Fehler beim Löschen des Gadgets. Bitte versuchen Sie es nochmals.", "Löschen fehlgeschlagen", MessageBoxButton.OK);
-                        }
-                    }
+                    _loansCollectionView = CollectionViewSource.GetDefaultView(Loans);
                 }
-            }
-            catch (InvalidCastException exception)
-            {
-                MessageBox.Show("Fehler beim Löschen des Gadgets. Bitte versuchen Sie es nochmals.", "Löschen fehlgeschlagen", MessageBoxButton.OK);
-                Debug.Print(exception.ToString());
+
+                return _loansCollectionView;
             }
         }
 
+        public LoanViewModel SelectedLoan
+        {
+            get
+            {
+                return (LoanViewModel)LoansCollectionView.CurrentItem;
+            }
+            set
+            {
+                LoansCollectionView.MoveCurrentTo(value);
+                RaisePropertyChanged(nameof(IsLoanSelected));
+            }
+        }
 
+        public bool IsLoanSelected
+        {
+            get { return SelectedLoan != null; }
+        }
+
+        private void OnLoanDataChanged(LoanViewModel loan, string propertyname)
+        {
+            dataService.UpdateLoan(loan.Data);
+        }
+
+        #endregion
+       
     }
 }

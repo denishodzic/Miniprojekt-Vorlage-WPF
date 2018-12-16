@@ -12,7 +12,6 @@ using System.Windows.Input;
 
 namespace Gadgeothek.WinUI.ViewModels
 {
-
     public class AddGadgetViewModel : BindableBase, IGadgetEditViewModel, INotifyDataErrorInfo
     {
         public string Title { get; } = "Gadget hinzufügen";
@@ -135,19 +134,16 @@ namespace Gadgeothek.WinUI.ViewModels
                 if (Name == null || Name.Length <= 0)
                 {
                     _validationErrors.Add(nameof(Name), "Invalid Name");
-                    //ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(Name)));
                 }
 
                 if (Manufacturer == null || Manufacturer.Length <= 0)
                 {
                     _validationErrors.Add(nameof(Manufacturer), "Invalid Manufacturer");
-                    //ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(Manufacturer)));
                 }
 
                 if (Price < 0)
                 {
                     _validationErrors.Add(nameof(Price), "Price has to be >= 0");
-                    //ErrorsChanged?.Invoke(this, new DataErrorsChangedEventArgs(nameof(Price)));
                 }
 
                 return _validationErrors.Any();
@@ -162,31 +158,5 @@ namespace Gadgeothek.WinUI.ViewModels
         {
             return _validationErrors[propertyName];
         }
-
-        //private void validateForm()
-        //{
-        //    if (_name == null || _name.Length <= 0)
-        //    {
-        //        IsFormValid = false;
-        //        return;
-        //    }
-
-        //    if (_manufacturer == null || _manufacturer.Length <= 0)
-        //    {
-        //        IsFormValid = false;
-        //        return;
-        //    }
-
-        //    if (_price <= 0.0)
-        //    {
-        //        IsFormValid = false;
-        //        return;
-        //    }
-
-        //    IsFormValid = true;
-        //    CommandManager.InvalidateRequerySuggested();
-
-        //    Debug.Print("Form is Valid");
-        //}
     }
 }

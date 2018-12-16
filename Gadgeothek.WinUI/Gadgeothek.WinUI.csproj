@@ -65,7 +65,12 @@
     <Compile Include="ViewModels\EditGadgetViewModel.cs" />
     <Compile Include="ViewModels\IGadgetEditViewModel.cs" />
     <Compile Include="ViewModels\GadgetViewModel.cs" />
+    <Compile Include="ViewModels\LoanViewModel.cs" />
     <Compile Include="ViewModels\MainWindowViewModel.cs" />
+    <Compile Include="ViewModels\PickLoanViewModel.cs" />
+    <Compile Include="Views\AddLoanView.xaml.cs">
+      <DependentUpon>AddLoanView.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Views\ChangeGadget.xaml.cs">
       <DependentUpon>ChangeGadget.xaml</DependentUpon>
     </Compile>
@@ -84,6 +89,10 @@
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Page Include="Views\AddLoanView.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Views\ChangeGadget.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

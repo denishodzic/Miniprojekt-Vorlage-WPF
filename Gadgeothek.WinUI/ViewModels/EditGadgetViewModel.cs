@@ -16,11 +16,11 @@ namespace Gadgeothek.WinUI.ViewModels
         private MainWindowViewModel _mainWindowViewModel;
         private GadgetViewModel _gadget;
 
-        public EditGadgetViewModel( MainWindowViewModel mainWindowViewModel , GadgetViewModel selectedGadget)
+        public EditGadgetViewModel( MainWindowViewModel mainWindowViewModel )
         {
             _mainWindowViewModel = mainWindowViewModel;
 
-            _gadget = new GadgetViewModel( selectedGadget.Data);
+            _gadget = new GadgetViewModel( _mainWindowViewModel.SelectedGadget.Data);
         }
 
         private ICommand _closeDialogCommand;

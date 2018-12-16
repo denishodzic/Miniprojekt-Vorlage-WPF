@@ -40,8 +40,18 @@
                 </Grid>
             </TabItem>
             <TabItem Header="Ausleihe">
-                <Grid Background="#FFE5E5E5">
-                    <DataGrid x:Name="loansGrid" HorizontalAlignment="Stretch" CanUserAddRows="False"  VerticalAlignment="Top" ColumnWidth="*" ItemsSource="{Binding Loans}" AutoGenerateColumns="False">
+                <StackPanel Orientation="Vertical">
+                    <Button x:Name="PickupLoanButton" Content="Neue Ausleihe" Width="Auto" Height="Auto" 
+                                Margin="5,0,0,0"
+                                Command="{Binding PickLoanCommand}" />
+                    <DataGrid x:Name="LoansDataGrid" 
+                              HorizontalAlignment="Stretch" 
+                              CanUserAddRows="False"  
+                              VerticalAlignment="Top" 
+                              ColumnWidth="*" 
+                              ItemsSource="{Binding LoansCollectionView}"
+                              SelectedItem="{Binding SelectedLoan, Mode=TwoWay}"
+                              AutoGenerateColumns="False">
                         <DataGrid.Columns>
                             <DataGridTextColumn Header="ID" Width="40" IsReadOnly="True" Binding="{Binding Id}" />
                             <DataGridTextColumn Header="Kunde" IsReadOnly="True" Binding="{Binding Customer.Name}" />
@@ -52,7 +62,7 @@
                             <DataGridCheckBoxColumn Header="Zurückgegeben" IsReadOnly="True" Binding="{Binding WasReturned, Mode=OneWay}" />
                         </DataGrid.Columns>
                     </DataGrid>
-                </Grid>
+                </StackPanel>
             </TabItem>
             <TabItem Header="Kunden">
                 <StackPanel Orientation="Vertical">

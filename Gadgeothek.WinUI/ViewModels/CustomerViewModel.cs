@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace Gadgeothek.WinUI.ViewModels
 {
+
     public class CustomerViewModel : BindableBase
     {
         public delegate void CustomerDataChanged(CustomerViewModel sender, string propertyname);
